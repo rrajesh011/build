@@ -243,11 +243,10 @@ endif
 endif
 
 ifeq ($(TARGET_KERNEL_CLANG_COMPILE),true)
-    # Only set clang-3859424 if TARGET_KERNEL_CLANG_VERSION hasn't been set by the device config
-    TARGET_KERNEL_CLANG_VERSION ?= 4.0.285906
-    # Find the clang-* directory containing the specified version
-    KERNEL_CLANG_VERSION := $(shell find $(ANDROID_BUILD_TOP)/prebuilts/clang/host/$(HOST_OS)-x86/ -name AndroidVersion.txt -exec grep -l $(TARGET_KERNEL_CLANG_VERSION) "{}" \; | sed -e 's|/AndroidVersion.txt$$||g;s|^.*/||g')
-    TARGET_KERNEL_CLANG_PATH ?= $(ANDROID_BUILD_TOP)/prebuilts/clang/host/$(HOST_OS)-x86/$(KERNEL_CLANG_VERSION)/bin
+    ifeq ($(TARGET_KERNEL_CLANG_VERSION),)
+        TARGET_KERNEL_CLANG_VERSION := $(DRAGONTC_VERSION)
+    endif
+    TARGET_KERNEL_CLANG_PATH ?= $(ANDROID_BUILD_TOP)/prebuilts/clang/host/$(HOST_OS)-x86/$(TARGET_KERNEL_CLANG_VERSION)/bin
     ifeq ($(KERNEL_ARCH),arm64)
         KERNEL_CLANG_TRIPLE ?= CLANG_TRIPLE=aarch64-linux-gnu-
     else ifeq ($(KERNEL_ARCH),arm)
